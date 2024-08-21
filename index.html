@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feriados em João Pessoa - PB, 2024</title>
+    
+    
+    
+ 
+   
+  
+   
+  
+        <title>Servidor API DATAS</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Servidor API DATAS</h1>
+        <button id="btn-data">Data Inicial, Data Final. Retorno: dias úteis.</button>
+        <button id="btn-dias-uteis">Data Inicial, quant dias úteis. Retorno: data final.</button>
+        <button id="btn-feriados">Nenhum parâmetro. Retorno: json dos feriados nacionais + estaduais + municipais.</button>
+    
+        <div id="data-inicial-container" style="display: none;">
+            <label for="data-inicial">Data Inicial:</label>
+            <input type="date" id="data-inicial" name="dataInicial">
+        </div>
+    
+        <div id="data-final-container" style="display: none;">
+            <label for="data-final">Data Final:</label>
+            <input type="date" id="data-final" name="dataFinal">
+        </div>
+
+        
+    
+        <div id="quant-dias-uteis-container" style="display: none;">
+            <label for="quant-dias-uteis">Quant. Dias Úteis:</label>
+            <input type="number" id="quant-dias-uteis" name="quantDiasUteis">
+        </div>
+    
+        <button id="btn-calcular" style="display: none;">Calcular</button>
+        <div id="result">
+          <label id="result-label"></label>
+          <div id="result-content"></div>
+          
+        </div>
+    
+        <script>
+            const btnData = document.getElementById('btn-data');
+            const btnDiasUteis = document.getElementById('btn-dias-uteis');
+            const btnFeriados = document.getElementById('btn-feriados');
+            const btnCalcular = document.getElementById('btn-calcular');
+            const resultLabel = document.getElementById('result-label');
+            const resultContent = document.getElementById('result-content');
+
+            
+    
+            function hideAllContainers() {
+                document.getElementById('data-inicial-container').style.display = 'none';
+                document.getElementById('data-final-container').style.display = 'none';
+                document.getElementById('quant-dias-uteis-container').style.display = 'none';
+                btnCalcular.style.display = 'none';
+                resultLabel.innerHTML = '';
+                resultContent.innerHTML = '';
+            }
+    
+            btnData.addEventListener('click', () => {
+  hideAllContainers();
+  document.getElementById('data-inicial-container').style.display = 'block';
+  document.getElementById('data-final-container').style.display = 'block';
+  btnCalcular.style.display = 'block';
+  btnCalcular.removeEventListener('click', calculateData);
+  btnCalcular.removeEventListener('click', calculateDiasUteis);
+  btnCalcular.addEventListener('click', calculateData);
+});
+
+btnDiasUteis.addEventListener('click', () => {
+  hideAllContainers();
+  document.getElementById('data-inicial-container').style.display = 'block';
+  document.getElementById('quant-dias-uteis-container').style.display = 'block';
+  btnCalcular.style.display = 'block';
+  btnCalcular.removeEventListener('click', calculateData);
+  btnCalcular.removeEventListener('click', calculateDiasUteis);
+  btnCalcular.addEventListener('click', calculateDiasUteis);
+});
+
+function calculateData() {
+  const dataInicial = document.getElementById('data-inicial').value;
+  const dataFinal = document.getElementById('data-final').value;
+  if (dataInicial && dataFinal) {
+    fetch(`/dias-uteis?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
+      .then(response => response.json())
+      .then(data => {
+        resultLabel.innerHTML = 'Dias Úteis:';
+        resultContent.innerHTML = data.diasUteis;
+      })
+      .catch(error => console.error(error));
+  }
+}
+
+function calculateDiasUteis() {
+  const dataInicial = document.getElementById('data-inicial').value;
+  const quantDiasUteis = document.getElementById('quant-dias-uteis').value;
+  if (dataInicial && quantDiasUteis) {
+    fetch(`/dias-uteis?dataInicial=${dataInicial}&quantDiasUteis=${quantDiasUteis}`)
+      .then(response => response.json())
+      .then(data => {
+        const dataFinal = data.dataFinal; // aqui você recebe a data final do servidor
+        const formattedDataFinal = new Date(dataFinal).toLocaleDateString('pt-BR', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).replace('-', '-'); // aqui você formata a data final
+        resultLabel.innerHTML = `Data Final: ${formattedDataFinal}`; // aqui você exibe a data final formatada
+      })
+      .catch(error => console.error(error));
+  }
+}
+    
+btnFeriados.addEventListener('click', () => {
+  hideAllContainers();
+  const data = [
+    { data: '01 de Janeiro de 2024', nome: 'Dia da Confraternização Universal (Ano Novo)' },
+    { data: '12, 13 e 14 de Fevereiro de 2024', nome: 'Carnaval' },
+    { data: '15 de Abril de 2024', nome: 'Paixão de Cristo' },
+    { data: '21 de Abril de 2024', nome: 'Tiradentes' },
+    { data: '01 de Maio de 2024', nome: 'Dia do Trabalho' },
+    { data: '30 de Maio de 2024', nome: 'Corpus Christi' },
+    { data: '24 de Junho de 2024', nome: 'Dia de São João' },
+    { data: '05 de Agosto de 2024', nome: 'Aniversário da Cidade; Dia da Padroeira das N.S. das Neves e Data magna do estado da Paraíba' },
+    { data: '07 de Setembro de 2024', nome: 'Dia da Independência' },
+    { data: '12 de Outubro de 2024', nome: 'Dia de Nossa Senhora Aparecida' },
+    { data: '28 de Outubro de 2024', nome: 'Dia do Servidor Público' },
+    { data: '02 de Novembro de 2024', nome: 'Dia de Finados' },
+    { data: '15 de Novembro de 2024', nome: 'Dia da Proclamação da República' },
+    { data: '20 de Novembro de 2024', nome: 'Dia da Consciência Negra' },
+    { data: '08 de Dezembro de 2024', nome: 'Dia de Nossa Senhora da Conceição' },
+    { data: '25 de Dezembro de 2024', nome: 'Natal' }
+  ];
+
+  const table = document.createElement('table');
+table.border = '1';
+
+const thead = document.createElement('thead');
+const tbody = document.createElement('tbody');
+
+table.appendChild(thead);
+table.appendChild(tbody);
+
+const row = document.createElement('tr');
+const th1 = document.createElement('th');
+th1.innerHTML = 'Data';
+const th2 = document.createElement('th');
+th2.innerHTML = 'Nome do Feriado';
+
+row.appendChild(th1);
+row.appendChild(th2);
+thead.appendChild(row);
+
+data.forEach(feriado => {
+  const row = document.createElement('tr');
+  const td1 = document.createElement('td');
+  td1.innerHTML = feriado.data;
+  const td2 = document.createElement('td');
+  td2.innerHTML = feriado.nome;
+
+  row.appendChild(td1);
+  row.appendChild(td2);
+  tbody.appendChild(row);
+});
+
+resultContent.innerHTML = '';
+resultContent.style.display = 'block';
+resultContent.style.height = 'auto';
+resultContent.style.width = '100%';
+resultContent.appendChild(table);
+
+result.style.display = 'block';
+result.style.overflow = 'auto';
+
+});
+
+</script>
+</body>
+</html> 
+
+
+
+  
