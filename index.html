@@ -1,193 +1,194 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
+<!DOCTYPE html> <!-- Declara que este é um documento HTML5 -->
+<html lang="pt-BR"> <!-- Define o idioma da página como português do Brasil -->
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feriados em João Pessoa - PB, 2024</title>
-    
-    
-    
- 
-   
-  
-   
-  
-        <title>Servidor API DATAS</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
+    <meta charset="UTF-8"> <!-- Define a codificação de caracteres como UTF-8 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Configura a visualização para dispositivos móveis -->
+    <title>Servidor API DATAS Paraíba</title> <!-- Define o título da página, que aparece na aba do navegador -->
+
+<!-- Define a fonte padrão da página como Arial ou sans-serif -->
+    <style> 
+        body {
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Servidor API DATAS</h1> <!-- Cabeçalho principal da página -->
+
+    <!-- Botões para selecionar a ação desejada -->
+    <button id="btn-data">Data Inicial, Data Final. Retorno: dias úteis.</button> <!-- Botão para calcular dias úteis entre duas datas -->
+    <button id="btn-dias-uteis">Data Inicial, quant dias úteis. Retorno: data final.</button> <!-- Botão para calcular a data final após adicionar dias úteis -->
+    <button id="btn-feriados">Nenhum parâmetro. Retorno: json dos feriados nacionais + estaduais + municipais.</button> <!-- Botão para exibir feriados -->
+
+    <!-- Contêineres de entrada de dados -->
+    <div id="data-inicial-container" style="display: none;"> <!-- Contêiner para selecionar a data inicial, oculto por padrão -->
+        <label for="data-inicial">Data Inicial:</label>
+        <input type="date" id="data-inicial" name="dataInicial"> <!-- Campo de entrada para a data inicial -->
+    </div>
+
+    <div id="data-final-container" style="display: none;"> <!-- Contêiner para selecionar a data final, oculto por padrão -->
+        <label for="data-final">Data Final:</label>
+        <input type="date" id="data-final" name="dataFinal"> <!-- Campo de entrada para a data final -->
+    </div>
+
+    <div id="quant-dias-uteis-container" style="display: none;"> <!-- Contêiner para inserir a quantidade de dias úteis, oculto por padrão -->
+        <label for="quant-dias-uteis">Quant. Dias Úteis:</label>
+        <input type="number" id="quant-dias-uteis" name="quantDiasUteis"> <!-- Campo de entrada para a quantidade de dias úteis -->
+    </div>
+
+    <button id="btn-calcular" style="display: none;">Calcular</button> <!-- Botão para iniciar o cálculo, oculto por padrão -->
+
+    <!-- Div para exibir os resultados -->
+    <div id="result">
+        <label id="result-label"></label> <!-- Rótulo para o resultado (ex: "Dias Úteis:") -->
+        <div id="result-content"></div> <!-- Div para exibir o conteúdo do resultado -->
+    </div>
+
+    <script>
+        // Referências aos elementos da página
+        const btnData = document.getElementById('btn-data');
+        const btnDiasUteis = document.getElementById('btn-dias-uteis');
+        const btnFeriados = document.getElementById('btn-feriados');
+        const btnCalcular = document.getElementById('btn-calcular');
+        const resultLabel = document.getElementById('result-label');
+        const resultContent = document.getElementById('result-content');
+
+        // Função para esconder todos os contêineres de entrada e limpar os resultados
+        function hideAllContainers() {
+            document.getElementById('data-inicial-container').style.display = 'none';
+            document.getElementById('data-final-container').style.display = 'none';
+            document.getElementById('quant-dias-uteis-container').style.display = 'none';
+            btnCalcular.style.display = 'none';
+            resultLabel.innerHTML = '';
+            resultContent.innerHTML = '';
+        }
+
+        // Evento para o botão "Data Inicial, Data Final. Retorno: dias úteis."
+        btnData.addEventListener('click', () => {
+            hideAllContainers(); // Esconde todos os contêineres
+            document.getElementById('data-inicial-container').style.display = 'block'; // Exibe o contêiner da data inicial
+            document.getElementById('data-final-container').style.display = 'block'; // Exibe o contêiner da data final
+            btnCalcular.style.display = 'block'; // Exibe o botão de calcular
+            btnCalcular.removeEventListener('click', calculateData); // Remove evento anterior para evitar múltiplas chamadas
+            btnCalcular.removeEventListener('click', calculateDiasUteis);
+            btnCalcular.addEventListener('click', calculateData); // Adiciona o evento para calcular dias úteis entre as datas
+        });
+
+        // Evento para o botão "Data Inicial, quant dias úteis. Retorno: data final."
+        btnDiasUteis.addEventListener('click', () => {
+            hideAllContainers(); // Esconde todos os contêineres
+            document.getElementById('data-inicial-container').style.display = 'block'; // Exibe o contêiner da data inicial
+            document.getElementById('quant-dias-uteis-container').style.display = 'block'; // Exibe o contêiner da quantidade de dias úteis
+            btnCalcular.style.display = 'block'; // Exibe o botão de calcular
+            btnCalcular.removeEventListener('click', calculateData); // Remove evento anterior para evitar múltiplas chamadas
+            btnCalcular.removeEventListener('click', calculateDiasUteis);
+            btnCalcular.addEventListener('click', calculateDiasUteis); // Adiciona o evento para calcular a data final
+        });
+
+        // Função para calcular os dias úteis entre duas datas
+        function calculateData() {
+            const dataInicial = document.getElementById('data-inicial').value; // Obtém a data inicial
+            const dataFinal = document.getElementById('data-final').value; // Obtém a data final
+            if (dataInicial && dataFinal) { // Verifica se ambas as datas foram fornecidas
+                fetch(`/dias-uteis?dataInicial=${dataInicial}&dataFinal=${dataFinal}`) // Envia a solicitação para a API
+                    .then(response => response.json()) // Converte a resposta para JSON
+                    .then(data => {
+                        resultLabel.innerHTML = 'Dias Úteis:'; // Exibe o rótulo do resultado
+                        resultContent.innerHTML = data.diasUteis; // Exibe a quantidade de dias úteis
+                    })
+                    .catch(error => console.error(error)); // Exibe erros no console
             }
-        </style>
-    </head>
-    <body>
-        <h1>Servidor API DATAS</h1>
-        <button id="btn-data">Data Inicial, Data Final. Retorno: dias úteis.</button>
-        <button id="btn-dias-uteis">Data Inicial, quant dias úteis. Retorno: data final.</button>
-        <button id="btn-feriados">Nenhum parâmetro. Retorno: json dos feriados nacionais + estaduais + municipais.</button>
-    
-        <div id="data-inicial-container" style="display: none;">
-            <label for="data-inicial">Data Inicial:</label>
-            <input type="date" id="data-inicial" name="dataInicial">
-        </div>
-    
-        <div id="data-final-container" style="display: none;">
-            <label for="data-final">Data Final:</label>
-            <input type="date" id="data-final" name="dataFinal">
-        </div>
+        }
 
-        
-    
-        <div id="quant-dias-uteis-container" style="display: none;">
-            <label for="quant-dias-uteis">Quant. Dias Úteis:</label>
-            <input type="number" id="quant-dias-uteis" name="quantDiasUteis">
-        </div>
-    
-        <button id="btn-calcular" style="display: none;">Calcular</button>
-        <div id="result">
-          <label id="result-label"></label>
-          <div id="result-content"></div>
-          
-        </div>
-    
-        <script>
-            const btnData = document.getElementById('btn-data');
-            const btnDiasUteis = document.getElementById('btn-dias-uteis');
-            const btnFeriados = document.getElementById('btn-feriados');
-            const btnCalcular = document.getElementById('btn-calcular');
-            const resultLabel = document.getElementById('result-label');
-            const resultContent = document.getElementById('result-content');
-
-            
-    
-            function hideAllContainers() {
-                document.getElementById('data-inicial-container').style.display = 'none';
-                document.getElementById('data-final-container').style.display = 'none';
-                document.getElementById('quant-dias-uteis-container').style.display = 'none';
-                btnCalcular.style.display = 'none';
-                resultLabel.innerHTML = '';
-                resultContent.innerHTML = '';
+        // Função para calcular a data final após adicionar dias úteis a uma data inicial
+        function calculateDiasUteis() {
+            const dataInicial = document.getElementById('data-inicial').value; // Obtém a data inicial
+            const quantDiasUteis = document.getElementById('quant-dias-uteis').value; // Obtém a quantidade de dias úteis
+            if (dataInicial && quantDiasUteis) { // Verifica se a data inicial e a quantidade de dias úteis foram fornecidas
+                fetch(`/dias-uteis?dataInicial=${dataInicial}&quantDiasUteis=${quantDiasUteis}`) // Envia a solicitação para a API
+                    .then(response => response.json()) // Converte a resposta para JSON
+                    .then(data => {
+                        const dataFinal = data.dataFinal; // Obtém a data final da resposta do servidor
+                        const formattedDataFinal = new Date(dataFinal).toLocaleDateString('pt-BR', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        }).replace('-', '-'); // Formata a data final para o formato brasileiro
+                        resultLabel.innerHTML = `Data Final: ${formattedDataFinal}`; // Exibe a data final formatada
+                    })
+                    .catch(error => console.error(error)); // Exibe erros no console
             }
-    
-            btnData.addEventListener('click', () => {
-  hideAllContainers();
-  document.getElementById('data-inicial-container').style.display = 'block';
-  document.getElementById('data-final-container').style.display = 'block';
-  btnCalcular.style.display = 'block';
-  btnCalcular.removeEventListener('click', calculateData);
-  btnCalcular.removeEventListener('click', calculateDiasUteis);
-  btnCalcular.addEventListener('click', calculateData);
-});
+        }
 
-btnDiasUteis.addEventListener('click', () => {
-  hideAllContainers();
-  document.getElementById('data-inicial-container').style.display = 'block';
-  document.getElementById('quant-dias-uteis-container').style.display = 'block';
-  btnCalcular.style.display = 'block';
-  btnCalcular.removeEventListener('click', calculateData);
-  btnCalcular.removeEventListener('click', calculateDiasUteis);
-  btnCalcular.addEventListener('click', calculateDiasUteis);
-});
+        // Evento para o botão "Nenhum parâmetro. Retorno: json dos feriados..."
+        btnFeriados.addEventListener('click', () => {
+            hideAllContainers(); // Esconde todos os contêineres
 
-function calculateData() {
-  const dataInicial = document.getElementById('data-inicial').value;
-  const dataFinal = document.getElementById('data-final').value;
-  if (dataInicial && dataFinal) {
-    fetch(`/dias-uteis?dataInicial=${dataInicial}&dataFinal=${dataFinal}`)
-      .then(response => response.json())
-      .then(data => {
-        resultLabel.innerHTML = 'Dias Úteis:';
-        resultContent.innerHTML = data.diasUteis;
-      })
-      .catch(error => console.error(error));
-  }
-}
+            // Define a lista de feriados
+            const data = [
+                { data: '01 de Janeiro de 2024', nome: 'Dia da Confraternização Universal (Ano Novo)' },
+                { data: '12, 13 e 14 de Fevereiro de 2024', nome: 'Carnaval' },
+                { data: '15 de Abril de 2024', nome: 'Paixão de Cristo' },
+                { data: '21 de Abril de 2024', nome: 'Tiradentes' },
+                { data: '01 de Maio de 2024', nome: 'Dia do Trabalho' },
+                { data: '30 de Maio de 2024', nome: 'Corpus Christi' },
+                { data: '24 de Junho de 2024', nome: 'Dia de São João' },
+                { data: '05 de Agosto de 2024', nome: 'Aniversário da Cidade; Dia da Padroeira das N.S. das Neves e Data magna do estado da Paraíba' },
+                { data: '07 de Setembro de 2024', nome: 'Dia da Independência' },
+                { data: '12 de Outubro de 2024', nome: 'Dia de Nossa Senhora Aparecida' },
+                { data: '28 de Outubro de 2024', nome: 'Dia do Servidor Público' },
+                { data: '02 de Novembro de 2024', nome: 'Dia de Finados' },
+                { data: '15 de Novembro de 2024', nome: 'Dia da Proclamação da República' },
+                { data: '20 de Novembro de 2024', nome: 'Dia da Consciência Negra' },
+                { data: '08 de Dezembro de 2024', nome: 'Dia de Nossa Senhora da Conceição' },
+                { data: '25 de Dezembro de 2024', nome: 'Natal' }
+            ];
 
-function calculateDiasUteis() {
-  const dataInicial = document.getElementById('data-inicial').value;
-  const quantDiasUteis = document.getElementById('quant-dias-uteis').value;
-  if (dataInicial && quantDiasUteis) {
-    fetch(`/dias-uteis?dataInicial=${dataInicial}&quantDiasUteis=${quantDiasUteis}`)
-      .then(response => response.json())
-      .then(data => {
-        const dataFinal = data.dataFinal; // aqui você recebe a data final do servidor
-        const formattedDataFinal = new Date(dataFinal).toLocaleDateString('pt-BR', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit'
-        }).replace('-', '-'); // aqui você formata a data final
-        resultLabel.innerHTML = `Data Final: ${formattedDataFinal}`; // aqui você exibe a data final formatada
-      })
-      .catch(error => console.error(error));
-  }
-}
-    
-btnFeriados.addEventListener('click', () => {
-  hideAllContainers();
-  const data = [
-    { data: '01 de Janeiro de 2024', nome: 'Dia da Confraternização Universal (Ano Novo)' },
-    { data: '12, 13 e 14 de Fevereiro de 2024', nome: 'Carnaval' },
-    { data: '15 de Abril de 2024', nome: 'Paixão de Cristo' },
-    { data: '21 de Abril de 2024', nome: 'Tiradentes' },
-    { data: '01 de Maio de 2024', nome: 'Dia do Trabalho' },
-    { data: '30 de Maio de 2024', nome: 'Corpus Christi' },
-    { data: '24 de Junho de 2024', nome: 'Dia de São João' },
-    { data: '05 de Agosto de 2024', nome: 'Aniversário da Cidade; Dia da Padroeira das N.S. das Neves e Data magna do estado da Paraíba' },
-    { data: '07 de Setembro de 2024', nome: 'Dia da Independência' },
-    { data: '12 de Outubro de 2024', nome: 'Dia de Nossa Senhora Aparecida' },
-    { data: '28 de Outubro de 2024', nome: 'Dia do Servidor Público' },
-    { data: '02 de Novembro de 2024', nome: 'Dia de Finados' },
-    { data: '15 de Novembro de 2024', nome: 'Dia da Proclamação da República' },
-    { data: '20 de Novembro de 2024', nome: 'Dia da Consciência Negra' },
-    { data: '08 de Dezembro de 2024', nome: 'Dia de Nossa Senhora da Conceição' },
-    { data: '25 de Dezembro de 2024', nome: 'Natal' }
-  ];
+            // Cria uma tabela para exibir os feriados
+            const table = document.createElement('table');
+            table.border = '1'; // Define a borda da tabela
 
-  const table = document.createElement('table');
-table.border = '1';
+            const thead = document.createElement('thead'); // Cria o cabeçalho da tabela
+            const tbody = document.createElement('tbody'); // Cria o corpo da tabela
 
-const thead = document.createElement('thead');
-const tbody = document.createElement('tbody');
+            table.appendChild(thead); // Adiciona o cabeçalho à tabela
+            table.appendChild(tbody); // Adiciona o corpo à tabela
 
-table.appendChild(thead);
-table.appendChild(tbody);
+            const row = document.createElement('tr'); // Cria uma linha para o cabeçalho
+            const th1 = document.createElement('th');
+            th1.innerHTML = 'Data'; // Cabeçalho da coluna de datas
+            const th2 = document.createElement('th');
+            th2.innerHTML = 'Nome do Feriado'; // Cabeçalho da coluna de nomes dos feriados
 
-const row = document.createElement('tr');
-const th1 = document.createElement('th');
-th1.innerHTML = 'Data';
-const th2 = document.createElement('th');
-th2.innerHTML = 'Nome do Feriado';
+            row.appendChild(th1); // Adiciona a célula "Data" à linha do cabeçalho
+            row.appendChild(th2); // Adiciona a célula "Nome do Feriado" à linha do cabeçalho
+            thead.appendChild(row); // Adiciona a linha do cabeçalho ao cabeçalho da tabela
 
-row.appendChild(th1);
-row.appendChild(th2);
-thead.appendChild(row);
+            // Adiciona cada feriado como uma linha na tabela
+            data.forEach(feriado => {
+                const row = document.createElement('tr');
+                const td1 = document.createElement('td');
+                td1.innerHTML = feriado.data; // Adiciona a data do feriado
+                const td2 = document.createElement('td');
+                td2.innerHTML = feriado.nome; // Adiciona o nome do feriado
 
-data.forEach(feriado => {
-  const row = document.createElement('tr');
-  const td1 = document.createElement('td');
-  td1.innerHTML = feriado.data;
-  const td2 = document.createElement('td');
-  td2.innerHTML = feriado.nome;
+                row.appendChild(td1); // Adiciona a célula de data à linha
+                row.appendChild(td2); // Adiciona a célula de nome do feriado à linha
+                tbody.appendChild(row); // Adiciona a linha ao corpo da tabela
+            });
 
-  row.appendChild(td1);
-  row.appendChild(td2);
-  tbody.appendChild(row);
-});
+            // Exibe a tabela com os feriados
+            resultContent.innerHTML = ''; // Limpa o conteúdo anterior
+            resultContent.style.display = 'block'; // Exibe o contêiner do resultado
+            resultContent.style.height = 'auto'; // Define a altura automática
+            resultContent.style.width = '100%'; // Define a largura como 100%
+            resultContent.appendChild(table); // Adiciona a tabela ao contêiner de resultados
 
-resultContent.innerHTML = '';
-resultContent.style.display = 'block';
-resultContent.style.height = 'auto';
-resultContent.style.width = '100%';
-resultContent.appendChild(table);
-
-result.style.display = 'block';
-result.style.overflow = 'auto';
-
-});
-
-</script>
+            result.style.display = 'block'; // Exibe o contêiner de resultados
+            result.style.overflow = 'auto'; // Define o comportamento de rolagem se necessário
+        });
+    </script>
 </body>
-</html> 
-
-
-
-  
+</html>
