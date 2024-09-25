@@ -18,7 +18,7 @@
 <li> 1-Abra o terminal ou prompt de comando.</li>
 <li> 2-Navegue até o diretório onde o seu projeto está localizado, se ainda não estiver lá.</li>
 <li>3-Execute o seguinte comando para instalar o cors: npm install cors</li>
-<li>Isso irá adicionar o módulo cors à sua aplicação. Após a instalação, tente rodar novamente o seu servidor com o comando: node servidor.js</li>
+<li>Isso irá adicionar o módulo cors à sua aplicação. Após a instalação, tente rodar novamente o seu servidor com o comando: node app.js</li>
       </ul>
       <p>Exemplos de uso:</p>
       <ul>
