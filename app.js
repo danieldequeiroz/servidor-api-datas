@@ -38,14 +38,9 @@ app.get('/api/feriadosnaofixos', (req, res) => {
   }
 });
 
-// Defina a rota para renderizar a view
+// Define a rota para renderizar a view
 app.get('/', (req, res) => {
-  try {
-    res.render('feriados', { feriados: feriados }); // Renderiza a view feriados.ejs com os feriados
-  } catch (error) {
-    console.error('Erro ao renderizar view:', error);
-    res.status(500).json({ message: 'Erro ao renderizar view' });
-  }
+  res.sendFile(__dirname + '/api/index.html'); // Serve the index.html file
 });
 
 // Serve static files from the same directory
