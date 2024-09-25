@@ -6,7 +6,7 @@ const feriados = require('./feriados');
 const feriadosFixos = require('./feriadosfixos.json');
 const feriadosNaoFixos = require('./feriadosnaofixos.json');
 const fs = require('fs');
-const servidor = require('./api/servidor');
+const servidor = require('./servidor');
 
 app.use(express.json()); // Habilita o suporte a JSON no corpo da requisição
 app.use(express.static(__dirname)); // Serve arquivos estáticos do mesmo diretório
