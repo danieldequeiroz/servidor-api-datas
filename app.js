@@ -6,9 +6,12 @@ const feriados = require('./feriados');
 const feriadosFixos = require('./feriadosfixos.json');
 const feriadosNaoFixos = require('./feriadosnaofixos.json');
 const fs = require('fs');
+const servidor = require('./api/servidor');
 
 app.use(express.json()); // Habilita o suporte a JSON no corpo da requisição
 app.use(express.static(__dirname)); // Serve arquivos estáticos do mesmo diretório
+
+
 
 // Defina a rota para exibir os feriados em JSON
 app.get('/api/feriados', (req, res) => {
@@ -129,7 +132,12 @@ function calculateDataFinal(dataInicial, quantDiasUteis) {
   return inicio.format('YYYY-MM-DD');
 }
 
+// Use as rotas do servidor.js 
+app.use('/api', servidor);
+
 // Inicie o servidor
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:3002`);
 });
+
+
