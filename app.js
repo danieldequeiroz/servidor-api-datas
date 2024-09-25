@@ -48,6 +48,9 @@ app.get('/', (req, res) => {
   }
 });
 
+// Serve static files from the same directory
+app.use(express.static(__dirname));
+
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:3002`);
 });
