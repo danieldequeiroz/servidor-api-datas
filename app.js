@@ -17,5 +17,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:3000`);
+  console.log(`Servidor rodando em http://localhost:3002`);
 });
