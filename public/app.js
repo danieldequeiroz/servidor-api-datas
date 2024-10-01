@@ -1,36 +1,38 @@
 const express = require('express');
 const app = express();
 const port = 3002;
-const helmet = require('helmet');  // Importa o Helmet do X-Frame-Options
-const moment = require('moment');
-const path = require('path');
-const feriados = require(path.join(__dirname, './api/feriados.json'));
-const feriadosFixos = require(path.join(__dirname, './api/feriadosfixos.json'));
-const feriadosNaoFixos = require(path.join(__dirname, './api/feriadosnaofixos.json'));
-const fs = require('fs');
-const servidor = require('./servidor');
-const cors = require('cors');
+const helmet = require('helmet');  // Importa o Helmet para aumentar a segurança, incluindo o cabeçalho X-Frame-Options
+const moment = require('moment');  // Importa a biblioteca Moment.js para manipulação de datas
+const path = require('path');  // Importa a biblioteca path para manipular caminhos de arquivos
+const feriados = require(path.join(__dirname, './api/feriados.json'));  // Importa o arquivo JSON que contém feriados
+const feriadosFixos = require(path.join(__dirname, './api/feriadosfixos.json'));  // Importa o JSON de feriados fixos
+const feriadosNaoFixos = require(path.join(__dirname, './api/feriadosnaofixos.json'));  // Importa o JSON de feriados não fixos
+const fs = require('fs');  // Importa o módulo de sistema de arquivos para leitura e escrita de arquivos
+const servidor = require('./servidor');  // Importa o arquivo 'servidor.js' que contém a lógica do backend
+const cors = require('cors');  // Importa o módulo CORS para permitir requisições entre diferentes domínios
 
-// Middleware do Helmet para cabeçalhos de segurança
+// Middleware do Helmet para adicionar cabeçalhos de segurança
 app.use(helmet({
-  contentSecurityPolicy: false,  // Temporariamente desativar CSP para testes
-  referrerPolicy: { policy: 'no-referrer' },  // Exemplo de configuração de Referrer-Policy
+  contentSecurityPolicy: false,  // Temporariamente desativa a Política de Segurança de Conteúdo (CSP) para facilitar testes
+  referrerPolicy: { policy: 'no-referrer' },  // Define a política de referenciador (não enviar referer em requisições)
 }));
 
-// Defina o cabeçalho X-Frame-Options
-app.use(helmet.frameguard({ action: 'SAMEORIGIN' })); // Impede que outros sites carreguem seu conteúdo em iframes
+// Configura o cabeçalho X-Frame-Options para SAMEORIGIN, impedindo que o conteúdo seja carregado em iframes em outros sites
+app.use(helmet.frameguard({ action: 'SAMEORIGIN' }));
 
+app.use(express.json());  // Habilita o suporte para JSON no corpo das requisições
 
-app.use(express.json());
+// Configura o CORS para permitir requisições de qualquer origem e com métodos específicos
 app.use(cors({
-  origin: '*',
- methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  headers: ['Content-Type', 'Authorization']
+  origin: '*',  // Permite requisições de qualquer origem
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],  // Permite esses métodos nas requisições
+  headers: ['Content-Type', 'Authorization']  // Permite os cabeçalhos especificados
 }));
 
+// Middleware para adicionar o cabeçalho Access-Control-Allow-Origin para permitir acesso de qualquer origem
 app.use((req, res, next) => {
- res.header('Access-Control-Allow-Origin', '*');
- next();
+  res.header('Access-Control-Allow-Origin', '*');  // Permite que qualquer domínio acesse os recursos da API
+  next();  // Passa para o próximo middleware
 });
 
 
