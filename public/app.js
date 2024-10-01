@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const port = 3002;
+const helmet = require('helmet');  // Importa o Helmet do X-Frame-Options
 const moment = require('moment');
 const path = require('path');
 const feriados = require(path.join(__dirname, './api/feriados.json'));
@@ -8,6 +9,30 @@ const feriadosFixos = require(path.join(__dirname, './api/feriadosfixos.json'));
 const feriadosNaoFixos = require(path.join(__dirname, './api/feriadosnaofixos.json'));
 const fs = require('fs');
 const servidor = require('./servidor');
+const cors = require('cors');
+
+// Middleware do Helmet para cabeçalhos de segurança
+app.use(helmet({
+  contentSecurityPolicy: false,  // Temporariamente desativar CSP para testes
+  referrerPolicy: { policy: 'no-referrer' },  // Exemplo de configuração de Referrer-Policy
+}));
+
+// Defina o cabeçalho X-Frame-Options
+app.use(helmet.frameguard({ action: 'SAMEORIGIN' })); // Impede que outros sites carreguem seu conteúdo em iframes
+
+
+app.use(express.json());
+app.use(cors({
+  origin: '*',
+ methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  headers: ['Content-Type', 'Authorization']
+}));
+
+app.use((req, res, next) => {
+ res.header('Access-Control-Allow-Origin', '*');
+ next();
+});
+
 
 app.use(express.json()); // Habilita o suporte a JSON no corpo da requisição
 app.use(express.static(__dirname)); // Serve arquivos estáticos do mesmo diretório
@@ -44,7 +69,7 @@ app.get('/api/feriadosnaofixos.json', (req, res) => {
   }
 });
 
-// Defina a rota para calcular os dias úteis entre duas datas
+// Define a rota para calcular os dias úteis entre duas datas
 app.get('/dias-uteis', (req, res) => {
   try {
     const dataInicial = req.query.dataInicial;
@@ -68,9 +93,64 @@ app.get('/dias-uteis', (req, res) => {
   }
 });
 
+// Função para verificar se uma data é um feriado
+function isFeriado(data) {
+  const dataFormatada = moment(data).format('YYYY-MM-DD');
+  return [...feriados, ...feriadosFixos, ...feriadosNaoFixos].some(feriado => feriado.date === dataFormatada);
+}
 
+// Função para calcular os dias úteis entre duas datas
+function calculateDiasUteis(dataInicial, dataFinal) {
+  const totalDias = moment(dataFinal).diff(moment(dataInicial), 'days') + 1;
+  const diasNaoUteis = calculateDiasNaoUteis(dataInicial, dataFinal);
+  return totalDias - diasNaoUteis;
+}
 
-// Defina a rota para adicionar um novo feriado
+// Função para calcular os dias não úteis entre duas datas
+function calculateDiasNaoUteis(dataInicial, dataFinal) {
+  const inicio = moment(dataInicial, 'YYYY-MM-DD');
+  const fim = moment(dataFinal, 'YYYY-MM-DD');
+  const diasNaoUteis = [];
+
+  while (inicio.isSameOrBefore(fim)) {
+    const formattedDate = inicio.format('YYYY-MM-DD');
+    if (inicio.day() === 0 || inicio.day() === 6 || isFeriado(formattedDate)) { // Check for Sunday, Saturday and feriados
+      diasNaoUteis.push(formattedDate);
+    }
+    inicio.add(1, 'day');
+  }
+
+  return diasNaoUteis.length;
+}
+
+// Função para calcular a data final após adicionar dias úteis a uma data inicial
+function calculateDataFinal(dataInicial, quantDiasUteis) {
+  const inicio = moment(dataInicial, 'YYYY-MM-DD');
+  if (!inicio.isValid()) {
+    throw new Error('Data inicial inválida');
+  }
+  let diasUteis = 0;
+
+  // Se a data inicial for sábado ou domingo, adicione um dia até que seja um dia útil
+  while (inicio.day() === 0 || inicio.day() === 6) {
+    inicio.add(1, 'day');
+  }
+
+  // Continuar até que o número de dias úteis necessários seja atingido
+  while (diasUteis < quantDiasUteis) {
+    const formattedDate = inicio.format('YYYY-MM-DD');
+    
+    // Verifica se o dia não é fim de semana e não é feriado
+    if (inicio.day() !== 0 && inicio.day() !== 6 && !isFeriado(formattedDate)) {
+      diasUteis++;
+    }
+    inicio.add(1, 'day');
+  }
+
+  return inicio.format('YYYY-MM-DD');
+}
+
+// Define a rota para adicionar um novo feriado
 app.post('/api/novo-feriado', (req, res) => {
   try {
     const { date, nome, type, fixed } = req.body;
@@ -96,38 +176,6 @@ app.post('/api/novo-feriado', (req, res) => {
   }
 });
 
-
-// Função para calcular os dias úteis entre duas datas
-function calculateDiasUteis(dataInicial, dataFinal) {
-  const inicio = moment(dataInicial, 'YYYY-MM-DD');
-  const fim = moment(dataFinal, 'YYYY-MM-DD');
-  const diasUteis = [];
-
-  while (inicio.isSameOrBefore(fim)) {
-    if (inicio.day() !== 0 && inicio.day() !== 6) {
-      diasUteis.push(inicio.format('YYYY-MM-DD'));
-    }
-    inicio.add(1, 'day');
-  }
-
-  return diasUteis.length;
-}
-
-// Função para calcular a data final após adicionar dias úteis a uma data inicial
-function calculateDataFinal(dataInicial, quantDiasUteis) {
-  const inicio = moment(dataInicial, 'YYYY-MM-DD');
-  let diasUteis = 0;
-
-  while (diasUteis < quantDiasUteis) {
-    inicio.add(1, 'day');
-    if (inicio.day() !== 0 && inicio.day() !== 6) {
-      diasUteis++;
-    }
-  }
-
-  return inicio.format('YYYY-MM-DD');
-}
-
 // Use as rotas do servidor.js 
 app.use('/api', servidor);
 
@@ -135,5 +183,3 @@ app.use('/api', servidor);
 app.listen(port, () => {
   console.log(`Servidor rodando em http://localhost:3002`);
 });
-
-
