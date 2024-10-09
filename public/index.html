@@ -11,23 +11,47 @@
     
 
 <!-- Define a fonte padrão da página como Arial ou sans-serif -->
-    <style> 
-        body {
-            font-family: Arial, sans-serif;
-        }
-    </style>
+<style>
+       
+ 
+  body {
+      font-family: Arial, sans-serif;
+      background-color: black; /* Define o fundo da página como preto */
+      color: white; /* Define a cor do texto como branco para contraste */
+  }
+
+  /* Estiliza os botões com cores "marca-texto" */
+  button {
+      background-color: yellow; /* Cor de fundo como marca-texto (amarelo) */
+      color: black; /* Cor do texto em preto para contraste */
+      border: none; /* Remove as bordas padrão dos botões */
+      padding: 10px 20px; /* Define o espaçamento interno dos botões */
+      font-size: 16px; /* Define o tamanho da fonte dos botões */
+      cursor: pointer; /* Muda o cursor para "pointer" ao passar sobre os botões */
+  }
+
+  /* Estilo para quando o mouse estiver sobre o botão */
+  button:hover {
+      background-color: lightyellow; /* Torna o fundo um pouco mais claro ao passar o mouse */
+  }
+
+  /* Adiciona um espaço entre os botões */
+  button + button {
+      margin-left: 10px; /* Espaço entre os botões */
+  }
+</style>
 </head>
 
 <body>
-    <h1>Servidor API DATAS</h1> <!-- Cabeçalho principal da página -->
-
+  <img src="logopretadejp.jpg" alt="Logo do Servidor API DATAS" width="150" height="80" />
+  <br> </br>
     <!-- Botões para selecionar a ação desejada -->
-    <button id="btn-data">Data Inicial, Data Final. Retorno: dias úteis.</button> <!-- Botão para calcular dias úteis entre duas datas -->
-    <button id="btn-dias-uteis">Data Inicial, quant dias úteis. Retorno: data final.</button> <!-- Botão para calcular a data final após adicionar dias úteis -->
-    <button id="btn-feriados">Nenhum parâmetro. Retorno: json dos feriados nacionais + estaduais + municipais.</button> <!-- Botão para exibir feriados -->
+    <button id="btn-data">Intervalo de Datas</button> <!-- Botão para calcular dias úteis entre duas datas -->
+    <button id="btn-dias-uteis">Data Final</button> <!-- Botão para calcular a data final após adicionar dias úteis -->
+    <button id="btn-feriados">Todos os Feriados</button> <!-- Botão para exibir feriados -->
     <button id="btn-feriadosfixos">Feriados Fixos</button> <!-- Botão para ve feriados fixos -->
     <button id="btn-feriadosnaofixos">Feriados Não Fixos</button> <!-- Botão para ve feriados nao fixos -->
-    <button id="btn-addferiados">adicionar feriados.</button> <!-- Botão para adicionar feriados -->
+    <button id="btn-addferiados">Adicionar Feriados</button> <!-- Botão para adicionar feriados -->
 
     <script>
       const btnFeriadosFixos = document.getElementById('btn-feriadosfixos');
@@ -40,7 +64,7 @@ btnFeriadosFixos.addEventListener('click', () => {
 });
     </script>
 
-    
+    <br><br><br>
 
     <!-- Contêineres de entrada de dados -->
     <div id="data-inicial-container" style="display: none;"> <!-- Contêiner para selecionar a data inicial, oculto por padrão -->
@@ -291,6 +315,7 @@ document.getElementById('btn-feriadosnaofixos').addEventListener('click', () => 
 
 
 // Evento para o botão "Adicionar Feriados"
+
 let formNovoFeriado = null;
 
 document.getElementById('btn-addferiados').addEventListener('click', () => {
