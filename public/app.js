@@ -10,6 +10,17 @@ const feriadosNaoFixos = require(path.join(__dirname, './api/feriadosnaofixos.js
 const fs = require('fs');  // Importa o módulo de sistema de arquivos para leitura e escrita de arquivos
 const servidor = require('./servidor');  // Importa o arquivo 'servidor.js' que contém a lógica do backend
 const cors = require('cors');  // Importa o módulo CORS para permitir requisições entre diferentes domínios
+const https = require('https');
+
+const keyPath = 'ssl.key/server.key';
+const certPath = 'ssl.crt/server.crt';
+
+if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
+  const sslOptions = {
+    key: fs.readFileSync(keyPath),
+    cert: fs.readFileSync(certPath)
+  };
+
 
 // Middleware do Helmet para adicionar cabeçalhos de segurança
 app.use(helmet({
@@ -182,6 +193,11 @@ app.post('/api/novo-feriado', (req, res) => {
 app.use('/api', servidor);
 
 // Inicie o servidor
-app.listen(port, () => {
-  console.log(`Servidor rodando em http://localhost:3002`);
+// Inicie o servidor
+https.createServer(sslOptions, app).listen(port, () => {
+  console.log(`Servidor rodando em https://localhost:3002`);
 });
+} else {
+console.error('Arquivos de certificado SSL não encontrados');
+process.exit(1);
+}
