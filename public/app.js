@@ -12,8 +12,9 @@ const servidor = require('./servidor');  // Importa o arquivo 'servidor.js' que 
 const cors = require('cors');  // Importa o módulo CORS para permitir requisições entre diferentes domínios
 const https = require('https');
 
-const keyPath = 'ssl.key/server.key';
-const certPath = 'ssl.crt/server.crt';
+const keyPath = 'ssl.key/server.key'; // Caminho para o arquivo da chave privada SSL (geralmente .key). Utilizada para decifrar informações recebidas de clientes.
+const certPath = 'ssl.crt/server.crt'; // Caminho para o arquivo do certificado SSL (geralmente .crt). Fornece a autenticação de identidade do servidor e permite a criptografia de dados.
+
 
 if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
   const sslOptions = {
@@ -22,14 +23,16 @@ if (fs.existsSync(keyPath) && fs.existsSync(certPath)) {
   };
 
 
-// Middleware do Helmet para adicionar cabeçalhos de segurança
+ // Middleware do Helmet para adicionar cabeçalhos de segurança na configuração atual
 app.use(helmet({
-  contentSecurityPolicy: false,  // Temporariamente desativa a Política de Segurança de Conteúdo (CSP) para facilitar testes
-  referrerPolicy: { policy: 'no-referrer' },  // Define a política de referenciador (não enviar referer em requisições)
+  contentSecurityPolicy: {
+    directives: {
+      "frame-ancestors": ["*"], // Permite que o conteúdo seja carregado em iframes de qualquer origem
+      "script-src": ["'self'", "'unsafe-inline'"], 
+      "style-src": ["'self'", "'unsafe-inline'"] 
+    },
+  },
 }));
-
-// Configura o cabeçalho X-Frame-Options para SAMEORIGIN, impedindo que o conteúdo seja carregado em iframes em outros sites
-app.use(helmet.frameguard({ action: 'SAMEORIGIN' }));
 
 app.use(express.json());  // Habilita o suporte para JSON no corpo das requisições
 
