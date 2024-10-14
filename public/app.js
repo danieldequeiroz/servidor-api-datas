@@ -141,22 +141,23 @@ function calculateDiasNaoUteis(dataInicial, dataFinal) {
 
 // Função para calcular a data final após adicionar dias úteis a uma data inicial
 function calculateDataFinal(dataInicial, quantDiasUteis) {
-  const inicio = moment(dataInicial, 'YYYY-MM-DD');
+  const inicio = moment(dataInicial, 'YYYY-MM-DD').add(1, 'day'); // Começa no próximo dia útil
+
   if (!inicio.isValid()) {
     throw new Error('Data inicial inválida');
   }
+
   let diasUteis = 0;
 
-  // Se a data inicial for sábado ou domingo, adicione um dia até que seja um dia útil
+  // Se o próximo dia for sábado ou domingo, pula para o próximo dia útil
   while (inicio.day() === 0 || inicio.day() === 6) {
     inicio.add(1, 'day');
   }
 
-  // Continuar até que o número de dias úteis necessários seja atingido
+  // Continua até atingir o número necessário de dias úteis
   while (diasUteis < quantDiasUteis) {
     const formattedDate = inicio.format('YYYY-MM-DD');
-    
-    // Verifica se o dia não é fim de semana e não é feriado
+
     if (inicio.day() !== 0 && inicio.day() !== 6 && !isFeriado(formattedDate)) {
       diasUteis++;
     }
@@ -165,7 +166,6 @@ function calculateDataFinal(dataInicial, quantDiasUteis) {
 
   return inicio.format('YYYY-MM-DD');
 }
-
 // Define a rota para adicionar um novo feriado
 app.post('/api/novo-feriado', (req, res) => {
   try {
