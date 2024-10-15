@@ -7,20 +7,22 @@
 
     <style>
         /* Estilo para telas grandes (desktop) */
-        @media (min-width: 1024px) {
+        @media (min-width: 1025px) {
           
             :root {
-                --rdp-accent-color: blue;
-                --rdp-accent-background-color: #f0f0ff;
+                --rdp-accent-color: #BEF264;
+                --rdp-accent-background-color: #0b0b0b;
                 --rdp-font-family: system-ui, sans-serif;
                 --btn-border-radius: 12px;
                 --btn-padding: 12px 24px;
-                --btn-bg-color: #007bff;
-                --btn-text-color: #fff;
-                --btn-bg-hover: #0056b3;
-                --btn-text-hover: #e0e0e0;
+                --btn-bg-color: #BEF264;
+                --btn-text-color: #0a0a0a;
+                --btn-bg-hover: #BEF201;
+                --btn-text-hover: #0b0b0b;
                 --btn-font-size: 1rem;
                 --btn-transition: 0.3s ease;
+                
+          
             }
 
             body {
@@ -49,6 +51,7 @@
     transition: background-color var(--btn-transition), color var(--btn-transition);
     margin-left: 20px; /* Espaça o botão à direita dos inputs */
     align-self: flex-start; /* Alinha o botão à direita no topo */
+    
 }
 
             button:hover {
@@ -68,7 +71,11 @@
     justify-content: flex-start; /* Alinha os elementos à esquerda */
     align-items: center; /* Alinha verticalmente os itens */
     margin: 20px 0;
+        flex-direction: column;
+
 }
+
+
 
 label {
     margin-right: 10px; /* Espaçamento entre o label e o input */
@@ -80,7 +87,8 @@ input[type="date"], input[type="number"] {
     border: 2px solid #ccc;
     background-color: #fff;
     color: #000;
-    margin-right: 20px; /* Adiciona espaço entre os campos */
+    margin-right: 30px; /* Adiciona espaço entre os campos */
+    border-color: rgb(229, 231, 235);
 }
 
             table {
@@ -121,20 +129,26 @@ input[type="date"], input[type="number"] {
             color: white;
             padding: 20px;
             text-align: center;
+            font-size: 0.9rem; /* Reduz o tamanho da fonte em telas menores */
         }
-        :root {
-                --rdp-accent-color: blue;
-                --rdp-accent-background-color: #f0f0ff;
+
+        button, input {
+        padding: 10px; /* Diminuir o padding para telas menores */
+    }
+            :root {
+                --rdp-accent-color: green;
+                --rdp-accent-background-color: #0b0b0b;
                 --rdp-font-family: system-ui, sans-serif;
                 --btn-border-radius: 12px;
                 --btn-padding: 12px 24px;
-                --btn-bg-color: #007bff;
-                --btn-text-color: #fff;
-                --btn-bg-hover: #0056b3;
-                --btn-text-hover: #e0e0e0;
+               --btn-bg-color: #BEF264;
+                --btn-text-color: #0a0a0a;
+                --btn-bg-hover: #00b33c;
+                --btn-text-hover: #0b0b0b;
                 --btn-font-size: 1rem;
-                --btn-transition: 0.3s ease;
+                --btn-transition: 0.3s ease; 
             }
+            
 
         button {
             display: block;
@@ -170,21 +184,30 @@ input[type="date"], input[type="number"] {
     display: flex; /* Alinha os itens lado a lado */
     justify-content: center; /* Centraliza os itens horizontalmente */
     align-items: center; /* Alinha os itens verticalmente no centro */
-    margin: 20px 0;
+   
     text-align: center; /* Centraliza o texto */
+    flex-direction: column; /* Colocar os elementos em coluna */
+    margin: 10px 0; /* Ajustar margens para telas menores */
 }
 
 #data-inicial-container input,
 #data-final-container input,
 #quant-dias-uteis-container input {
-    margin: 0 10px; /* Espaçamento entre os inputs */
-}
+  margin: 5px 0; /* Diminuir o espaço entre os inputs */
+  width: 90%; /* Reduzir a largura para caber na tela */}
+
+
 
 .form-container {
     display: flex;
     justify-content: center;
     align-items: center;
     gap: 20px; /* Espaçamento entre os contêineres */
+}
+
+#labelCategoriaFeriado span {
+    white-space: normal; /* Permite a quebra de linha automática */
+    word-wrap: break-word; /* Quebra as palavras, se necessário */
 }
 
 
@@ -194,13 +217,19 @@ input[type="date"], input[type="number"] {
             background-color: #222;
             border-radius: 8px;
             font-weight: bold;
+            font-size: 0.9rem;
         }
-    }
+       
+  
+}
+
+    
 </style>
 </head>
 
 
 <body>
+  
   <img src="logopretadejp.jpg" alt="Logo do Servidor API DATAS" width="150" height="80" />
   <br> </br>
     <!-- Botões para selecionar a ação desejada -->
@@ -499,16 +528,22 @@ document.getElementById('btn-addferiados').addEventListener('click', () => {
   datePickerContainer.appendChild(perguntaLabel);
   datePickerContainer.appendChild(datePickerInput);
   formNovoFeriado.appendChild(datePickerContainer);
+formNovoFeriado.appendChild(document.createElement('br')); // Add line break
+
 
   // Nome do feriado
   const labelNome = document.createElement('label');
   labelNome.textContent = 'Nome do Feriado:';
   formNovoFeriado.appendChild(labelNome);
+  
 
   const inputNome = document.createElement('input');
   inputNome.type = 'text';
   inputNome.id = 'nome';
   formNovoFeriado.appendChild(inputNome);
+  formNovoFeriado.appendChild(document.createElement('br')); // Add line break
+  formNovoFeriado.appendChild(document.createElement('br')); // Add line break
+
 
   // Tipo de feriado (fixo ou não fixo)
 const labelTipoFeriado = document.createElement('div');
@@ -533,20 +568,33 @@ labelCategoriaFeriado.style.alignItems = 'center';  // Centraliza verticalmente
 labelCategoriaFeriado.style.justifyContent = 'center';  // Centraliza horizontalmente
 labelCategoriaFeriado.style.marginBottom = '10px';  // Espaçamento entre o tipo e a categoria
 
+formNovoFeriado.appendChild(document.createElement('br')); // Add line break
 labelCategoriaFeriado.innerHTML = `
-  <span style="margin-right: 20px;">Selecione a categoria do feriado:</span>
-  <label style="margin-right: 10px;">Feriado Nacional:</label>
-  <input type="radio" id="feriado-nacional" name="type" value="feriado nacional" style="margin-right: 20px;">
-  <label style="margin-right: 10px;">Feriado Estadual:</label>
-  <input type="radio" id="feriado-estadual" name="type" value="feriado estadual" style="margin-right: 20px;">
-  <label style="margin-right: 10px;">Feriado Municipal:</label>
-  <input type="radio" id="feriado-municipal" name="type" value="feriado municipal" style="margin-right: 20px;">
-  <label style="margin-right: 10px;">Ponto Facultativo:</label>
-  <input type="radio" id="ponto-facultativo" name="type" value="ponto facultativo">
+  <span style="display: block; margin-bottom: 20px;">Selecione a categoria  do feriado: \n</span>
+  <l>
+    <div style="display: block; margin-bottom: 10px;">
+      <input type="radio" id="feriado-nacional" name="type" value="feriado nacional">
+      <label style="display: inline-block; margin-left: 5px;">Feriado Nacional</label>
+    </div>
+  <p>
+    <div style="display: block; margin-bottom: 10px;">
+      <input type="radio" id="feriado-estadual" name="type" value="feriado estadual">
+      <label style="display: inline-block; margin-left: 5px;">Feriado Estadual</label>
+    </div>
+  </p>
+    <div style="display: block; margin-bottom: 10px;">
+      <input type="radio" id="feriado-municipal" name="type" value="feriado municipal">
+      <label style="display: inline-block; margin-left: 5px;">Feriado Municipal</label>
+    </div>
+  <p>
+    <div style="display: block; margin-bottom: 10px;">
+      <input type="radio" id="ponto-facultativo" name="type" value="ponto facultativo">
+      <label style="display: inline-block; margin-left: 5px;">Ponto Facultativo</label>
+    </div>
+  
 `;
 
 formNovoFeriado.appendChild(labelCategoriaFeriado);
-
 
   // Botão de adicionar
   const buttonAdicionar = document.createElement('button');
