@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .                 # Define que o serviço será construído a partir do Dockerfile no diretório atual.
+    ports:
+      - "3002:3002"          # Mapeia a porta 3002 do host para a porta 3002 do contêiner.
+    volumes:
+      - .:/usr/src/app       # Monta o diretório atual no host para o caminho /usr/src/app no contêiner.
+    environment:
+      - NODE_ENV=development # Define a variável de ambiente NODE_ENV como "development".
+    deploy:
+      resources:
+        limits:
+          memory: 512M       # Limita o uso de memória do contêiner a 512 MB (ajustável conforme necessário).
